@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
 import numpy as np
 import os
 import pandas as pd
@@ -57,8 +58,10 @@ def main():
    
 	epochs = 1000
 	m = len(df["mileage"])
-	
-	plt.scatter(df["mileage"], df["price"])
+
+	fig = plt.figure()
+	scat = plt.scatter(df["mileage"], df["price"])
+	line2 = plt.plot(df["mileage"], df["price"], color='blue')
 
 	for epoch in range(epochs):
 		h = estimate_price(df["mileage"])
@@ -69,15 +72,20 @@ def main():
 
 		if epoch % 100 == 0:
 			print(f"Epoch {epoch}, Cost: {cost}")
-		#display_plot(df, theta0, theta1)
-		plt.plot(df["mileage"], h, color="red")
-		plt.pause(0.01)
-		plt.clf()
-		plt.scatter(df["mileage"], df["price"])
-		plt.xlabel("Mileage")
-		plt.ylabel("Price")
-		plt.title("Price of cars")
-		plt.show()
+		
+
+	def update(frame):
+		# display new regression line with new theta0 and theta1
+		y_pred = theta0 * df["mileage"] + theta1
+		plt.plot(df["mileage"], y_pred, color='red')
+		plt.title(f'Epoch {frame+1}')
+		plt.xlabel('X')
+		plt.ylabel('y')
+		return (scat, line2)
+
+
+	ani = FuncAnimation(fig=fig, func=update, frames=40, interval=10)
+	plt.show()
 
 
 	# Affichage du modèle ajusté
