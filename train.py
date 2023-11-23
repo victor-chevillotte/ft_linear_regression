@@ -8,6 +8,7 @@ theta0 = 0
 theta1 = 0
 learning_rate = 0.01
 
+
 def load_data():
 	# Vérifier si le fichier existe
 	filename = "data/data.csv"
@@ -25,15 +26,32 @@ def load_data():
 
 def estimate_price(mileage):
 	global theta0, theta1
-	return theta0 + theta1 * mileage
+	print("theta0", theta0)
+	print("theta1", theta1)
+	print("mileage", mileage)
+	return (theta0 + theta1 * mileage)
 
 
-def calculate_theta0(learning_rate, m, mileage, price):
-	return learning_rate * (1 / m) * estimate_price(mileage) - price
+def calculate_theta0(mileage, price):
+	m = mileage.size
+	print("size", m)
+	adjustedSum = 0
+	for i in range(m):
+		print("************")
+		print(estimate_price(mileage[i]))
+		print(mileage[i])
+		print(price[i])
+		adjustedSum += estimate_price(mileage[i]) - price[i]
+	print("adjustedSum", adjustedSum)
+	return adjustedSum / m
 
 
-def calculate_theta1(learning_rate, m, mileage, price):
-	return learning_rate * (1 / m) * (estimate_price(mileage) - price) * mileage
+def calculate_theta1(mileage, price):
+	m = mileage.size
+	adjustedSum = 0
+	for i in range(m):
+		adjustedSum += (estimate_price(mileage[i]) - price[i]) * mileage[i]
+	return adjustedSum / m
 
 
 def cost_function(m, mileage, price):
@@ -41,6 +59,7 @@ def cost_function(m, mileage, price):
 
 
 def main():
+	global theta0, theta1, learning_rate
 	df = load_data()
 
 	# Création du DataFrame correctement
@@ -52,46 +71,54 @@ def main():
 	plt.xlabel("Mileage")
 	plt.ylabel("Price")
 	plt.title("Price of cars")
-	plt.show()
+	#plt.show()
 
 	# Initialisation des paramètres
-   
-	epochs = 1000
-	m = len(df["mileage"])
+
+
+	
+	def update(frame):
+		# display new regression line with new theta0 and theta1
+		plt.title(f"Epoch {frame+1}")
+		#print("================")
+		min_v = min(df["mileage"])
+		max_v = max(df["mileage"])
+		#print("***********")
+		#print(theta0)
+		#print(theta1)
+		#print(theta0 + theta1 * min_v)
+		#print(theta0 + theta1 * max_v)
+		#print("------------")
+		line2 = plt.plot(
+			[min_v, max_v], [theta0 + theta1 * min_v, theta0 + theta1 * max_v]
+		)
+		return (scat, line2)
+
 
 	fig = plt.figure()
 	scat = plt.scatter(df["mileage"], df["price"])
-	line2 = plt.plot(df["mileage"], df["price"], color='blue')
+	#ani = FuncAnimation(fig=fig, func=update, interval=5)
+	#plt.show()
 
+	epochs = 1
+	m = len(df["mileage"])
 	for epoch in range(epochs):
 		h = estimate_price(df["mileage"])
 		cost = cost_function(m, h, df["price"])
 
-		theta0 = calculate_theta0(learning_rate, m, df["mileage"], df["price"])
-		theta1 = calculate_theta1(learning_rate, m, df["mileage"], df["price"])
+		for i in range(20):
+			res = calculate_theta0(df["mileage"], df["price"])
+			print(res)
+			theta0 = theta0 - learning_rate * calculate_theta0(df["mileage"], df["price"])
+			theta1 = theta1 - learning_rate * calculate_theta1(df["mileage"], df["price"])
 
 		if epoch % 100 == 0:
 			print(f"Epoch {epoch}, Cost: {cost}")
-		
-
-	def update(frame):
-		# display new regression line with new theta0 and theta1
-		y_pred = theta0 * df["mileage"] + theta1
-		plt.plot(df["mileage"], y_pred, color='red')
-		plt.title(f'Epoch {frame+1}')
-		plt.xlabel('X')
-		plt.ylabel('y')
-		return (scat, line2)
 
 
-	ani = FuncAnimation(fig=fig, func=update, frames=40, interval=10)
-	plt.show()
-
+	
 
 	# Affichage du modèle ajusté
-	
-	
-	
 
 
 if __name__ == "__main__":
