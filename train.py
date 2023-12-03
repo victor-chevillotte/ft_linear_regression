@@ -198,6 +198,7 @@ def main():
     rmsePlot.set_xlabel("Epoch")
     rmsePlot.set_ylabel("RMSE")
     rmsePlot.set_title("RMSE Over Time")
+    fig.subplots_adjust(hspace=0.3)  # Add space between rows
 
     ax_button = plt.axes([0.05, 0.9, 0.1, 0.075])
     btn = Button(ax_button, 'Start training')
