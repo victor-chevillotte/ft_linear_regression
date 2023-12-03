@@ -7,13 +7,6 @@ def normalizeLst(lst):
         normalized.append((value - min(lst)) / (max(lst) - min(lst)))
     return normalized
 
-def	normalizeElem(list, elem):
-	return ((elem - min(list)) / (max(list) - min(list)))
-
-def	denormalizeElem(list, elem):
-	return ((elem * (max(list) - min(list))) + min(list))
-
-
 # Goal function
 def estimatePrice(theta0, theta1, mileage):
     return theta0 + (theta1 * mileage)
@@ -36,9 +29,20 @@ def meanError1(x, y, theta0, theta1):
         adjustedSum += (estimatePrice(theta0, theta1, x[i]) - y[i]) * x[i]
     return adjustedSum / m
 
-def computeRMSE(x, y, theta0, theta1):
-    return np.sqrt(computeCost(x, y, theta0, theta1))
-
+# Compute precision
+def computePrecision (x, y, theta0, theta1):
+	m = len(x)
+	errorSum = 0
+	for i in range(m):
+    	#prevent division by 0
+		if y[i] == 0:
+			continue
+		error = (estimatePrice(theta0, theta1, x[i]) - y[i]) / y[i]
+		if error > 0:
+			errorSum += error
+		else:
+			errorSum -= error
+	return errorSum / m
 
 
 
