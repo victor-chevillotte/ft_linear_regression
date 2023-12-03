@@ -30,6 +30,11 @@ def meanError1(x, y, theta0, theta1):
     return adjustedSum / m
 
 # Compute precision
+# We compute the average of the relative error
+# We add the absolute value of the error if the error is negative
+# We substract the absolute value of the error if the error is positive
+# We divide by the number of values
+# We multiply by 100 to get a percentage
 def computePrecision (x, y, theta0, theta1):
 	m = len(x)
 	errorSum = 0
@@ -45,10 +50,12 @@ def computePrecision (x, y, theta0, theta1):
 	return errorSum / m
 
 
-
+# Cost function
+# We compute the average of the squared errors
+# We divide by 2m (m = number of values)
 def computeCost(x, y, theta0, theta1):
     m = len(x)
     total_error = 0.0
     for i in range(m):
-        total_error += (theta0 + theta1 * x[i] - y[i]) ** 2
+        total_error += (estimatePrice(theta0, theta1, x[i]) - y[i]) ** 2
     return total_error / (2 * m)

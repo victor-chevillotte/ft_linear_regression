@@ -15,7 +15,7 @@ from utils import (
 # Paramètres initiaux
 theta0 = 0
 theta1 = 0
-learning_rate = 0.02
+learning_rate = 0.5
 epochs = 5000
 current_epoch = 0
 display_step = 100
@@ -153,9 +153,9 @@ def train(axs, df, normedMileages, normedPrices):
         plt.gcf().canvas.flush_events()  # Traiter les événements de l'interface utilisateur
 
 
-def show_results(df):
+def show_results(axs, df, btn):
     global theta0, theta1, cost_history, precision_history
-
+    btn.label.set_text("Training finished !")
     print("theta finaux normalisés")
     print(theta0)
     print(theta1)
@@ -178,11 +178,21 @@ def show_results(df):
     print("cost")
     print(cost_history[-1])
     error = computePrecision(df["mileage"], df["price"], theta0_denorm, theta1_denorm) 
+    print("Precision is", 100 - round(error * 100, 2), "% (average error is", round(error * 100, 2), "%)")
 
-    # Output precision
-    print("Precision is", 100 - round(error * 100, 2), "% (average error is", round(error * 100, 2), "%")
     
+    # Plot cost and precision
+    classicPlot = axs[0, 0]
+    normedPlot = axs[0, 1]
+    costPlot = axs[1, 0]
+    precisionPlot = axs[1, 1]
 
+    # Annotate final theta values on the classic and normalized plots
+    cost_text = f"Final cost: {round(cost_history[-1], 4)}"
+    costPlot.annotate(cost_text, xy=(0.5, 0.8), xycoords='axes fraction', ha='center', fontsize=9, color='blue')
+    precision_text = f"Final precision: {round(100 - round(error * 100, 2), 2)}%"
+    precisionPlot.annotate(precision_text, xy=(0.5, 0.8), xycoords='axes fraction', ha='center', fontsize=9, color='green')
+    plt.show()
 
 def main():
     df = load_data()
@@ -215,7 +225,7 @@ def main():
     precisionPlot.set_title("Precision Over Time")
     fig.subplots_adjust(hspace=0.3)  # Add space between rows
 
-    ax_button = plt.axes([0.05, 0.9, 0.1, 0.075])
+    ax_button = plt.axes([0.05, 0.93, 0.2, 0.05])
     btn = Button(ax_button, "Start training")
 
     def on_button_clicked(event):
@@ -226,7 +236,7 @@ def main():
         normedMileages = normalizeLst(df["mileage"])
         normedPrices = normalizeLst(df["price"])
         train(axs, df, normedMileages, normedPrices)
-        show_results(df)
+        show_results(axs, df, btn)
 
     btn.on_clicked(on_button_clicked)
     plt.show()
