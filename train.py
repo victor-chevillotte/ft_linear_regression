@@ -3,6 +3,7 @@ from matplotlib.animation import FuncAnimation
 from matplotlib.widgets import Button
 import numpy as np
 import os
+import time
 import pandas as pd
 from utils import (
     normalizeLst,
@@ -63,9 +64,8 @@ def gradientDescent(epochs, learning_rate, normedMileages, normedPrices, df):
 def load_data():
     filename = "data/data.csv"
     if not os.path.exists(filename):
-        error("File not found", filename)
+        error(f"File not found : {filename}. Please add it to the data folder.")
         exit()
-
     data = np.genfromtxt(filename, delimiter=",", skip_header=1)
     df = pd.DataFrame(data, columns=["mileage", "price"])
     return df
@@ -94,7 +94,6 @@ def update_graphs(axs, df, normedMileages, normedPrices):
     normedPlot.scatter(normedMileages, normedPrices)
 
     # Denormalize theta values
-    # TODO : explicit formula for denormalization
 
     theta0_denorm = (
         theta0 * (max(df["price"]) - min(df["price"]))
@@ -157,8 +156,8 @@ def train(axs, df, normedMileages, normedPrices):
             break
         gradientDescent(display_step, learning_rate, normedMileages, normedPrices, df)
         update_graphs(axs, df, normedMileages, normedPrices)
-        plt.gcf().canvas.draw_idle()  # Redessiner le graphique
-        plt.gcf().canvas.flush_events()  # Traiter les événements de l'interface utilisateur
+        plt.gcf().canvas.draw_idle()  #Redraw the current figure
+        plt.gcf().canvas.flush_events()  # Flush the GUI events for the figure
 
 def store_results(theta0, theta1):
     title("Storing results...")
@@ -215,7 +214,8 @@ def show_results(axs, df, btn):
     costPlot.annotate(cost_text, xy=(0.5, 0.6), xycoords='axes fraction', ha='center', fontsize=9, color='blue')
     precision_text = f"Final precision: {round(100 - round(error * 100, 2), 2)}%"
     precisionPlot.annotate(precision_text, xy=(0.5, 0.6), xycoords='axes fraction', ha='center', fontsize=9, color='green')
-    plt.show()
+    plt.gcf().canvas.draw_idle()  #Redraw the current figure
+    plt.gcf().canvas.flush_events()  # Flush the GUI events for the figure
 
 def main():
     df = load_data()
