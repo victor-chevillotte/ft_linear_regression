@@ -31,7 +31,7 @@ def estimate():
 	if (not mileage.isdigit()):
 		error("Mileage must be a positive number")
 		exit()
-	print("\nBased on current predictions, a car with a mileage of", mileage, "kilometers would be worth :")
+	print("\nBased on the trained model, a car with a mileage of", mileage, "kilometers would be worth :")
 	result = theta0 + (theta1 * float(mileage))
 	if (result < 0):
 		print("0$")
