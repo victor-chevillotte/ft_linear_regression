@@ -1,7 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 from train import load_data
-from messages import debug, title, normal, success, verbose, error
+from messages import title, normal, error
 
 
 def get_thetas():
@@ -73,17 +73,17 @@ def estimate():
     if not mileage.isdigit():
         error("Mileage must be a positive number")
         exit()
-    print(
+    normal(
         "\nBased on the trained model, a car with a mileage of",
         mileage,
         "kilometers would be worth :",
     )
     result = theta0 + (theta1 * float(mileage))
     if result < 0:
-        print("0 $")
+        title("0 $")
         result = 0
     else:
-        print(f"{result:.2f} $")
+        title(f"{result:.2f} $")
     df = load_data()
     displayEstimate(df["mileage"], df["price"], theta0, theta1, float(mileage), result)
 
