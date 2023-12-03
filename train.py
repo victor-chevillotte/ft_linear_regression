@@ -160,13 +160,15 @@ def train(axs, df, normedMileages, normedPrices):
         plt.gcf().canvas.draw_idle()  # Redessiner le graphique
         plt.gcf().canvas.flush_events()  # Traiter les événements de l'interface utilisateur
 
-def store_results():
+def store_results(theta0, theta1):
     title("Storing results...")
-    global theta0, theta1, cost_history, precision_history
     try :
-        with open("data/results.txt", "w") as f:
-            f.write(f"theta0 : {theta0}\n")
-            f.write(f"theta1 : {theta1}\n")
+        with open("data/results.csv", "w") as f:
+            f.write("theta0,theta1\n")
+            for i in range(len(cost_history)):
+                f.write(
+                    f"{theta0},{theta1}\n"
+                )
         success("Results stored !")
     except Exception as e:
         error("Error while storing results", e)
@@ -203,7 +205,7 @@ def show_results(axs, df, btn):
     title("Final precision :")
     error = computePrecision(df["mileage"], df["price"], theta0_denorm, theta1_denorm) 
     normal(f"{100 - round(error * 100, 2)} % (average error : {round(error * 100, 2)} %)")
-    store_results()
+    store_results(theta0_denorm, theta1_denorm)
     # Plot cost and precision
     costPlot = axs[1, 0]
     precisionPlot = axs[1, 1]
