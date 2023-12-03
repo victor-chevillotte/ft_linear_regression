@@ -11,11 +11,18 @@ from utils import (
     computeCost,
     computePrecision
 )
-
+from messages import (
+    debug,
+    title,
+    normal,
+    success,
+    verbose,
+    error
+)
 # Paramètres initiaux
 theta0 = 0
 theta1 = 0
-learning_rate = 0.5
+learning_rate = 0.01
 epochs = 5000
 current_epoch = 0
 display_step = 100
@@ -56,7 +63,7 @@ def gradientDescent(epochs, learning_rate, normedMileages, normedPrices, df):
 def load_data():
     filename = "data/data.csv"
     if not os.path.exists(filename):
-        print("File not found", filename)
+        error("File not found", filename)
         exit()
 
     data = np.genfromtxt(filename, delimiter=",", skip_header=1)
@@ -66,7 +73,7 @@ def load_data():
 
 def update_graphs(axs, df, normedMileages, normedPrices):
     global theta0, theta1, current_epoch
-    print(f"Epoch {current_epoch}")
+    print(f"Epoch {current_epoch}", end="\r", flush=True)
 
     # Nettoyage des graphiques
     classicPlot = axs[0, 0]
@@ -140,26 +147,39 @@ def update_graphs(axs, df, normedMileages, normedPrices):
 
 
 def train(axs, df, normedMileages, normedPrices):
+    success("Starting training !")
     for epoch in range(int(epochs / display_step)):
         if (
             len(cost_history) > 1
             and cost_history[-1] > cost_history[-2] - training_threshold
         ):
-            print("Cost is not decreasing anymore, stopping training")
+            normal("Cost function is not decreasing anymore (< e^-7), stopping training")
             break
         gradientDescent(display_step, learning_rate, normedMileages, normedPrices, df)
         update_graphs(axs, df, normedMileages, normedPrices)
         plt.gcf().canvas.draw_idle()  # Redessiner le graphique
         plt.gcf().canvas.flush_events()  # Traiter les événements de l'interface utilisateur
 
+def store_results():
+    title("Storing results...")
+    global theta0, theta1, cost_history, precision_history
+    try :
+        with open("data/results.txt", "w") as f:
+            f.write(f"theta0 : {theta0}\n")
+            f.write(f"theta1 : {theta1}\n")
+        success("Results stored !")
+    except Exception as e:
+        error("Error while storing results", e)
+
 
 def show_results(axs, df, btn):
     global theta0, theta1, cost_history, precision_history
     btn.label.set_text("Training finished !")
-    print("theta finaux normalisés")
-    print(theta0)
-    print(theta1)
-    print("thetas finaux")
+    success("Training finished !")
+    title("Final thetas :")
+    normal(theta0)
+    normal(theta1)
+
     theta0_denorm = (
         theta0 * (max(df["price"]) - min(df["price"]))
         + min(df["price"])
@@ -173,17 +193,18 @@ def show_results(axs, df, btn):
         * (max(df["price"]) - min(df["price"]))
         / (max(df["mileage"]) - min(df["mileage"]))
     )
-    print(theta0_denorm)
-    print(theta1_denorm)
-    print("cost")
-    print(cost_history[-1])
-    error = computePrecision(df["mileage"], df["price"], theta0_denorm, theta1_denorm) 
-    print("Precision is", 100 - round(error * 100, 2), "% (average error is", round(error * 100, 2), "%)")
+    title("Final denormalized thetas :")
+    normal(theta0_denorm)
+    normal(theta1_denorm)
 
-    
+    title("Final cost :")
+    normal(cost_history[-1])
+
+    title("Final precision :")
+    error = computePrecision(df["mileage"], df["price"], theta0_denorm, theta1_denorm) 
+    normal(f"{100 - round(error * 100, 2)} % (average error : {round(error * 100, 2)} %)")
+    store_results()
     # Plot cost and precision
-    classicPlot = axs[0, 0]
-    normedPlot = axs[0, 1]
     costPlot = axs[1, 0]
     precisionPlot = axs[1, 1]
 
