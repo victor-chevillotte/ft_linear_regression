@@ -210,9 +210,9 @@ def show_results(axs, df, btn):
 
     # Annotate final theta values on the classic and normalized plots
     cost_text = f"Final cost: {round(cost_history[-1], 4)}"
-    costPlot.annotate(cost_text, xy=(0.5, 0.8), xycoords='axes fraction', ha='center', fontsize=9, color='blue')
+    costPlot.annotate(cost_text, xy=(0.5, 0.6), xycoords='axes fraction', ha='center', fontsize=9, color='blue')
     precision_text = f"Final precision: {round(100 - round(error * 100, 2), 2)}%"
-    precisionPlot.annotate(precision_text, xy=(0.5, 0.8), xycoords='axes fraction', ha='center', fontsize=9, color='green')
+    precisionPlot.annotate(precision_text, xy=(0.5, 0.6), xycoords='axes fraction', ha='center', fontsize=9, color='green')
     plt.show()
 
 def main():
