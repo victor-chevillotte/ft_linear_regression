@@ -5,21 +5,9 @@ import numpy as np
 import os
 import time
 import pandas as pd
-from utils import (
-    normalizeLst,
-    meanError0,
-    meanError1,
-    computeCost,
-    computePrecision
-)
-from messages import (
-    debug,
-    title,
-    normal,
-    success,
-    verbose,
-    error
-)
+from utils import normalizeLst, meanError0, meanError1, computeCost, computePrecision
+from messages import debug, title, normal, success, verbose, error
+
 # Paramètres initiaux
 theta0 = 0
 theta1 = 0
@@ -57,9 +45,12 @@ def gradientDescent(epochs, learning_rate, normedMileages, normedPrices, df):
             * (max(df["price"]) - min(df["price"]))
             / (max(df["mileage"]) - min(df["mileage"]))
         )
-        precision = computePrecision(df["mileage"], df["price"], theta0_denorm, theta1_denorm)
-        
+        precision = computePrecision(
+            df["mileage"], df["price"], theta0_denorm, theta1_denorm
+        )
+
         precision_history.append(100 - round(precision * 100, 2))
+
 
 def load_data():
     filename = "data/data.csv"
@@ -142,7 +133,9 @@ def update_graphs(axs, df, normedMileages, normedPrices):
     precisionPlot.set_xlabel("Epoch")
     precisionPlot.set_ylabel("Precision %")
     precisionPlot.set_title("Precision Over Time")
-    precisionPlot.plot(range(current_epoch), precision_history[:current_epoch], color="green")
+    precisionPlot.plot(
+        range(current_epoch), precision_history[:current_epoch], color="green"
+    )
 
 
 def train(axs, df, normedMileages, normedPrices):
@@ -152,22 +145,22 @@ def train(axs, df, normedMileages, normedPrices):
             len(cost_history) > 1
             and cost_history[-1] > cost_history[-2] - training_threshold
         ):
-            normal("Cost function is not decreasing anymore (< e^-7), stopping training")
+            normal(
+                "Cost function is not decreasing anymore (< e^-7), stopping training"
+            )
             break
         gradientDescent(display_step, learning_rate, normedMileages, normedPrices, df)
         update_graphs(axs, df, normedMileages, normedPrices)
-        plt.gcf().canvas.draw_idle()  #Redraw the current figure
+        plt.gcf().canvas.draw_idle()  # Redraw the current figure
         plt.gcf().canvas.flush_events()  # Flush the GUI events for the figure
+
 
 def store_results(theta0, theta1):
     title("Storing results...")
-    try :
+    try:
         with open("data/results.csv", "w") as f:
             f.write("theta0,theta1\n")
-            for i in range(len(cost_history)):
-                f.write(
-                    f"{theta0},{theta1}\n"
-                )
+            f.write(f"{theta0},{theta1}\n")
         success("Results stored !")
     except Exception as e:
         error("Error while storing results", e)
@@ -202,8 +195,10 @@ def show_results(axs, df, btn):
     normal(cost_history[-1])
 
     title("Final precision :")
-    error = computePrecision(df["mileage"], df["price"], theta0_denorm, theta1_denorm) 
-    normal(f"{100 - round(error * 100, 2)} % (average error : {round(error * 100, 2)} %)")
+    error = computePrecision(df["mileage"], df["price"], theta0_denorm, theta1_denorm)
+    normal(
+        f"{100 - round(error * 100, 2)} % (average error : {round(error * 100, 2)} %)"
+    )
     store_results(theta0_denorm, theta1_denorm)
     # Plot cost and precision
     costPlot = axs[1, 0]
@@ -211,11 +206,26 @@ def show_results(axs, df, btn):
 
     # Annotate final theta values on the classic and normalized plots
     cost_text = f"Final cost: {round(cost_history[-1], 4)}"
-    costPlot.annotate(cost_text, xy=(0.5, 0.6), xycoords='axes fraction', ha='center', fontsize=9, color='blue')
+    costPlot.annotate(
+        cost_text,
+        xy=(0.5, 0.6),
+        xycoords="axes fraction",
+        ha="center",
+        fontsize=9,
+        color="blue",
+    )
     precision_text = f"Final precision: {round(100 - round(error * 100, 2), 2)}%"
-    precisionPlot.annotate(precision_text, xy=(0.5, 0.6), xycoords='axes fraction', ha='center', fontsize=9, color='green')
-    plt.gcf().canvas.draw_idle()  #Redraw the current figure
+    precisionPlot.annotate(
+        precision_text,
+        xy=(0.5, 0.6),
+        xycoords="axes fraction",
+        ha="center",
+        fontsize=9,
+        color="green",
+    )
+    plt.gcf().canvas.draw_idle()  # Redraw the current figure
     plt.gcf().canvas.flush_events()  # Flush the GUI events for the figure
+
 
 def main():
     df = load_data()
