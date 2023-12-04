@@ -74,9 +74,7 @@ def estimate():
         error("Mileage must be a positive number")
         exit()
     normal(
-        "\nBased on the trained model, a car with a mileage of",
-        mileage,
-        "kilometers would be worth :",
+        f"\nBased on the trained model, a car with a mileage of {mileage} kilometers would be worth :",
     )
     result = theta0 + (theta1 * float(mileage))
     if result < 0:
