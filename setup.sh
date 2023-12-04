@@ -4,8 +4,8 @@ if command -v apt-get &> /dev/null; then
     sudo apt-get install python3-venv
     sudo apt install python3-tk
 fi
-python3 -m venv virtual_env
-source virtual_env/bin/activate
+python3 -m venv .venv
+source .venv/bin/activate
 if [[ "$VIRTUAL_ENV" != "" ]]; then
     echo "env created!"
     pip install -r requirements.txt
