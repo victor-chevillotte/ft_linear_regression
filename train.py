@@ -25,12 +25,16 @@ def gradientDescent(epochs, learning_rate, normedMileages, normedPrices, df):
     global theta0, theta1, current_epoch, cost_history, precision_history
     for i in range(epochs):
         current_epoch += 1
-        theta0 = theta0 - learning_rate * meanError0(
+        tmp_theta0 = 0
+        tmp_theta1 = 0
+        tmp_theta0 = learning_rate * meanError0(
             normedMileages, normedPrices, theta0, theta1
         )
-        theta1 = theta1 - learning_rate * meanError1(
+        tmp_theta1 = learning_rate * meanError1(
             normedMileages, normedPrices, theta0, theta1
         )
+        theta0 -= tmp_theta0
+        theta1 -= tmp_theta1
         cost_history.append(computeCost(normedMileages, normedPrices, theta0, theta1))
         theta0_denorm = (
             theta0 * (max(df["price"]) - min(df["price"]))
